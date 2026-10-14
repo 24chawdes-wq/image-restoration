@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LumiPix — AI Image Restoration &amp; Deblurring</title>
+    <meta name="description" content="LumiPix: Restore blurred images with AI-powered deblurring. Wiener Deconvolution, Unsharp Masking, Adaptive Deblur. See every detail clearly.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════ NAVBAR ══ -->
+<nav class="navbar" id="navbar">
+    <div class="nav-container">
+        <a href="#" class="brand-logo" id="brandLogo">
+            <div class="brand-icon">
+                <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="logoGrad" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0%" stop-color="#6366f1"/>
+                            <stop offset="100%" stop-color="#06b6d4"/>
+                        </linearGradient>
+                    </defs>
+                    <rect width="32" height="32" rx="9" fill="url(#logoGrad)"/>
+                    <circle cx="16" cy="16" r="6" fill="none" stroke="white" stroke-width="2.2"/>
+                    <path d="M16 6 L16 4" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M16 28 L16 26" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M6 16 L4 16" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M28 16 L26 16" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                    <circle cx="16" cy="16" r="2.5" fill="white"/>
+                </svg>
+            </div>
+            <div class="brand-text">
+                <span class="brand-title">Lumi<span class="highlight">Pix</span></span>
+                <span class="brand-subtitle">Image Restoration AI</span>
+            </div>
+        </a>
+
+        <div class="nav-links">
+            <a href="#studio" class="nav-link active">Studio</a>
+            <a href="#samples-section" class="nav-link">Samples</a>
+            <a href="#theory-section" class="nav-link">Science</a>
+            <a href="#instructions-section" class="nav-link">Guide</a>
+        </div>
+
+        <div class="nav-actions">
+            <div class="auth-buttons-group" id="navAuthLoggedOut">
+                <button type="button" class="btn btn-sm btn-ghost" id="navSignInBtn">Sign In</button>
+                <button type="button" class="btn btn-sm btn-primary" id="navSignUpBtn">Get Started</button>
+            </div>
+            <div class="user-profile-menu" id="navAuthLoggedIn" style="display: none;">
+                <button type="button" class="user-avatar-btn" id="userMenuToggle" title="Account Menu">
+                    <span class="user-avatar-initials" id="userNavInitials">JD</span>
+                    <span class="user-nav-name" id="userNavName">User</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="chevron-icon">
+                        <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                </button>
+                <div class="user-dropdown-panel" id="userDropdownPanel" style="display: none;">
+                    <div class="dropdown-header">
+                        <strong id="dropdownUserName">User Name</strong>
+                        <span id="dropdownUserEmail">user@example.com</span>
+                        <span class="badge badge-success badge-sm">Verified</span>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-history-section">
+                        <span class="dropdown-section-title">Recent Activity</span>
+                        <div class="dropdown-history-list" id="dropdownHistoryList">
+                            <span class="empty-history-text">No recent restorations yet</span>
+                        </div>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <button type="button" class="dropdown-item text-danger" id="logoutBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="item-icon">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                            <polyline points="16 17 21 12 16 7"/>
+                            <line x1="21" y1="12" x2="9" y2="12"/>
+                        </svg>
+                        Sign Out
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════ HERO ══ -->
+<header class="hero-section">
+    <div class="hero-bg-animation">
+        <div class="hero-orb orb-1"></div>
+        <div class="hero-orb orb-2"></div>
+        <div class="hero-orb orb-3"></div>
+        <div class="hero-grid"></div>
+    </div>
+    <div class="container hero-content">
+        <div class="hero-pill">
+            <span class="pill-dot pulse"></span>
+            AI-Powered Deblurring Engine &mdash; Real Results
+        </div>
+        <h1 class="hero-title">
+            Turn <span class="hero-title-blur">Blur</span> Into<br>
+            <span class="hero-title-gradient">Crystal Clarity</span>
+        </h1>
+        <p class="hero-description">
+            Upload any blurred photo and watch <strong>LumiPix</strong> recover sharp edges, fine textures, and
+            hidden details — using Wiener Deconvolution, Richardson–Lucy iterations,
+            and adaptive multi-scale contrast enhancement.
+        </p>
+        <div class="hero-actions">
+            <a href="#studio" class="btn btn-xl btn-gradient" id="heroStartBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="btn-icon">
+                    <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/>
+                    <path d="M12 12v9"/><path d="m16 16-4-4-4 4"/>
+                </svg>
+                Restore My Image
+            </a>
+            <button class="btn btn-xl btn-ghost-white" id="heroSampleBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                    <polyline points="21 15 16 10 5 21"/>
+                </svg>
+                Try Demo Images
+            </button>
+        </div>
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <span class="stat-num">4</span>
+                <span class="stat-label">Algorithms</span>
+            </div>
+            <div class="hero-stat-divider"></div>
+            <div class="hero-stat">
+                <span class="stat-num">8-Step</span>
+                <span class="stat-label">Pipeline</span>
+            </div>
+            <div class="hero-stat-divider"></div>
+            <div class="hero-stat">
+                <span class="stat-num">100%</span>
+                <span class="stat-label">Free &amp; Private</span>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════════ STUDIO ══ -->
+<main class="studio-section" id="studio">
+    <div class="container">
+        <div class="section-header text-center">
+            <span class="section-tag">Interactive Workspace</span>
+            <h2 class="section-title">LumiPix Restoration Studio</h2>
+            <p class="section-subtitle">Upload your blurred image, pick a technique, and watch every detail come alive.</p>
+        </div>
+
+        <div class="studio-grid">
+            <!-- LEFT PANEL: Controls -->
+            <div class="studio-controls-panel">
+
+                <!-- Step 1: Image Upload -->
+                <div class="card control-card">
+                    <div class="card-header">
+                        <div class="step-badge">1</div>
+                        <div>
+                            <h3 class="card-title">Upload Your Blurred Image</h3>
+                            <p class="card-desc">Drag &amp; drop or click to browse — PNG, JPG, WebP (Max 16 MB)</p>
+                        </div>
+                    </div>
+
+                    <div class="upload-dropzone" id="dropzone">
+                        <input type="file" id="fileInput" accept="image/png,image/jpeg,image/jpg,image/webp,image/bmp" class="file-input-hidden">
+                        <div class="dropzone-content" id="dropzoneDefault">
+                            <div class="dropzone-icon-wrap">
+                                <div class="dropzone-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                                        <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/>
+                                        <path d="M12 12v9"/>
+                                        <path d="m16 16-4-4-4 4"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <p class="dropzone-text"><strong>Drag &amp; drop</strong> your image here</p>
+                            <p class="dropzone-or">— or —</p>
+                            <button type="button" class="btn btn-sm btn-primary" onclick="document.getElementById('fileInput').click()">Browse Files</button>
+                            <p class="dropzone-hint">PNG, JPG, WebP, BMP up to 16 MB</p>
+                        </div>
+
+                        <div class="dropzone-preview" id="dropzonePreview" style="display: none;">
+                            <img id="sourcePreviewImg" src="" alt="Source Preview">
+                            <div class="preview-overlay">
+                                <span id="previewFileName" class="preview-filename">image.png</span>
+                                <button type="button" class="btn btn-xs btn-light" id="changeImageBtn">Change Image</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sample images -->
+                    <div class="samples-quick-select" id="samples-section">
+                        <span class="quick-select-label">Or try a preset sample:</span>
+                        <div class="sample-pills">
+                            <button type="button" class="sample-pill" data-sample="motion_blurred_license">
+                                <span class="pill-dot motion"></span> Motion Blur
+                            </button>
+                            <button type="button" class="sample-pill" data-sample="defocus_test_pattern">
+                                <span class="pill-dot defocus"></span> Out-of-Focus
+                            </button>
+                            <button type="button" class="sample-pill" data-sample="soft_noisy_texture">
+                                <span class="pill-dot soft"></span> Soft &amp; Noisy
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Algorithm Selection -->
+                <div class="card control-card">
+                    <div class="card-header">
+                        <div class="step-badge">2</div>
+                        <div>
+                            <h3 class="card-title">Choose Restoration Algorithm</h3>
+                            <p class="card-desc">Select the technique that matches your image's blur type</p>
+                        </div>
+                    </div>
+
+                    <div class="filter-cards-grid">
+                        <div class="filter-card active" data-filter="adaptive">
+                            <div class="filter-card-radio"><div class="radio-circle"></div></div>
+                            <div class="filter-card-content">
+                                <div class="filter-card-top">
+                                    <h4 class="filter-card-title">Smart Adaptive Deblur</h4>
+                                    <span class="badge badge-success">Recommended</span>
+                                </div>
+                                <p class="filter-card-desc">8-step pipeline: Richardson–Lucy deconvolution, multi-scale detail recovery, CLAHE, TV denoising &amp; edge polish. Best for ALL image types.</p>
+                            </div>
+                        </div>
+
+                        <div class="filter-card" data-filter="wiener">
+                            <div class="filter-card-radio"><div class="radio-circle"></div></div>
+                            <div class="filter-card-content">
+                                <div class="filter-card-top">
+                                    <h4 class="filter-card-title">Wiener Deconvolution</h4>
+                                    <span class="badge badge-primary">PSF-Based</span>
+                                </div>
+                                <p class="filter-card-desc">Frequency-domain inverse filtering (MMSE). Best when you know the blur model: motion or defocus PSF.</p>
+                            </div>
+                        </div>
+
+                        <div class="filter-card" data-filter="unsharp">
+                            <div class="filter-card-radio"><div class="radio-circle"></div></div>
+                            <div class="filter-card-content">
+                                <div class="filter-card-top">
+                                    <h4 class="filter-card-title">Unsharp Masking</h4>
+                                    <span class="badge badge-accent">Edge Boost</span>
+                                </div>
+                                <p class="filter-card-desc">Spatial high-pass sharpening. Subtracts a Gaussian-blurred copy to amplify local edge contrast.</p>
+                            </div>
+                        </div>
+
+                        <div class="filter-card" data-filter="gaussian">
+                            <div class="filter-card-radio"><div class="radio-circle"></div></div>
+                            <div class="filter-card-content">
+                                <div class="filter-card-top">
+                                    <h4 class="filter-card-title">Gaussian Filter</h4>
+                                    <span class="badge badge-info">Noise Removal</span>
+                                </div>
+                                <p class="filter-card-desc">Low-pass spatial smoothing. Removes sensor noise and grain — not a deblurring filter.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Parameters -->
+                <div class="card control-card">
+                    <div class="card-header">
+                        <div class="step-badge">3</div>
+                        <div>
+                            <h3 class="card-title">Fine-Tune Parameters</h3>
+                            <p class="card-desc" id="paramSectionDesc">Adjust Point Spread Function and noise regularization</p>
+                        </div>
+                    </div>
+
+                    <!-- Adaptive params -->
+                    <div class="params-group" id="adaptiveParams">
+                        <div class="param-row">
+                            <div class="param-label-wrapper">
+                                <label for="adaptiveStrength" class="param-label">Restoration Strength:</label>
+                                <span class="param-value" id="adaptiveStrengthVal">2.2&times;</span>
+                            </div>
+                            <input type="range" id="adaptiveStrength" min="0.5" max="4.0" step="0.1" value="2.2" class="form-range">
+                            <span class="field-help">Higher = sharper edges and more detail recovery</span>
+                        </div>
+                        <div class="param-row">
+                            <div class="param-label-wrapper">
+                                <label for="adaptiveIters" class="param-label">Deconvolution Iterations:</label>
+                                <span class="param-value" id="adaptiveItersVal">14 iters</span>
+                            </div>
+                            <input type="range" id="adaptiveIters" min="3" max="25" step="1" value="14" class="form-range">
+                            <span class="field-help">More iterations = finer detail, but slightly slower</span>
+                        </div>
+                        <div class="clarity-toggle-row">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="adaptiveClarityCheck" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <div>
+                                <strong class="clarity-title">HD Clarity Polish</strong>
+                                <p class="clarity-desc">Enhances edge contrast and recovers crisp text details</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Wiener params -->
+                    <div class="params-group" id="wienerParams" style="display: none;">
+                        <div class="param-row" style="margin-bottom: 0.25rem;">
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="autoDetectPsfBtn" style="width: 100%;">
+                                Auto-Detect PSF for this Image
+                            </button>
+                        </div>
+                        <div class="param-row">
+                            <label for="psfTypeSelect" class="param-label">Degradation PSF Model:</label>
+                            <select id="psfTypeSelect" class="form-select">
+                                <option value="gaussian">Out-of-Focus (Gaussian)</option>
+                                <option value="motion">Motion Blur (Linear)</option>
+                                <option value="disk">Disk Defocus</option>
+                            </select>
+                            <span class="field-help">Type of blur modeled</span>
+                        </div>
+                        <div class="param-row">
+                            <div class="param-label-wrapper">
+                                <label for="psfSizeSlider" class="param-label">Blur Kernel Length (PSF Size):</label>
+                                <span class="param-value" id="psfSizeVal">15 px</span>
+                            </div>
+                            <input type="range" id="psfSizeSlider" min="3" max="45" step="2" value="15" class="form-range">
+                        </div>
+                        <div class="param-row" id="angleRow">
+                            <div class="param-label-wrapper">
+                                <label for="psfAngleSlider" class="param-label">Motion Angle:</label>
+                                <span class="param-value" id="psfAngleVal">0&deg;</span>
+                            </div>
+                            <input type="range" id="psfAngleSlider" min="0" max="180" step="5" value="0" class="form-range">
+                        </div>
+                        <div class="param-row">
+                            <div class="param-label-wrapper">
+                                <label for="kFactorSlider" class="param-label">Regularization Parameter (K / SNR):</label>
+                                <span class="param-value" id="kFactorVal">0.01</span>
+                            </div>
+                            <input type="range" id="kFactorSlider" min="0.001" max="0.5" step="0.001" value="0.01" class="form-range">
+                            <span class="field-help">Lower = sharper but may ring; Higher = smoother but softer</span>
+                        </div>
+                    </div>
+
+                    <!-- Unsharp params -->
+                    <div class="params-group" id="unsharpParams" style="display: none;">
+                        <div class="param-row">
+                            <div class="param-label-wrapper">
+                                <label for="unsharpAmount" class="param-label">Sharpening Strength (Amount):</label>
+                                <span class="param-value" id="unsharpAmountVal">1.5&times;</span>
+                            </div>
+                            <input type="range" id="unsharpAmount" min="0.1" max="3.0" step="0.1" value="1.5" class="form-range">
+                        </div>
+                        <div class="param-row">
+                            <div class="param-label-wrapper">
+                                <label for="unsharpRadius" class="param-label">Edge Radius (Sigma):</label>
+                                <span class="param-value" id="unsharpRadiusVal">1.5 px</span>
+                            </div>
+                            <input type="range" id="unsharpRadius" min="0.5" max="5.0" step="0.1" value="1.5" class="form-range">
+                        </div>
+                        <div class="param-row">
+                            <div class="param-label-wrapper">
+                                <label for="unsharpThreshold" class="param-label">Noise Threshold:</label>
+                                <span class="param-value" id="unsharpThresholdVal">0</span>
+                            </div>
+                            <input type="range" id="unsharpThreshold" min="0" max="30" step="1" value="0" class="form-range">
+                            <span class="field-help">Ignore edges smaller than this — prevents sharpening noise</span>
+                        </div>
+                    </div>
+
+                    <!-- Gaussian params -->
+                    <div class="params-group" id="gaussianParams" style="display: none;">
+                        <div class="param-row">
+                            <div class="param-label-wrapper">
+                                <label for="gaussKernel" class="param-label">Kernel Size:</label>
+                                <span class="param-value" id="gaussKernelVal">5 px</span>
+                            </div>
+                            <input type="range" id="gaussKernel" min="3" max="31" step="2" value="5" class="form-range">
+                        </div>
+                        <div class="param-row">
+                            <div class="param-label-wrapper">
+                                <label for="gaussSigma" class="param-label">Sigma (Smoothing Width):</label>
+                                <span class="param-value" id="gaussSigmaVal">1.0</span>
+                            </div>
+                            <input type="range" id="gaussSigma" min="0.1" max="6.0" step="0.1" value="1.0" class="form-range">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Restore Button -->
+                <button type="button" class="btn btn-xl btn-gradient btn-restore" id="restoreBtn" disabled>
+                    <span id="restoreBtnContent">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="btn-icon">
+                            <path d="M12 2L12 6M12 18L12 22M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M2 12H6M18 12H22M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+                        </svg>
+                        Restore Image — Make It Clear
+                    </span>
+                    <span id="restoreBtnLoading" style="display: none;">
+                        <span class="spinner"></span> Processing...
+                    </span>
+                </button>
+            </div>
+
+            <!-- RIGHT PANEL: Results -->
+            <div class="studio-results-panel" id="resultsPanel">
+                <!-- Placeholder -->
+                <div class="results-placeholder" id="resultsPlaceholder">
+                    <div class="placeholder-visual">
+                        <div class="placeholder-img blurry-box">
+                            <div class="blur-dot"></div><div class="blur-dot"></div><div class="blur-dot"></div>
+                        </div>
+                        <div class="placeholder-arrow">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </div>
+                        <div class="placeholder-img clear-box">
+                            <div class="clear-dot"></div><div class="clear-dot"></div><div class="clear-dot"></div>
+                        </div>
+                    </div>
+                    <h3 class="placeholder-title">Your Restored Image Appears Here</h3>
+                    <p class="placeholder-desc">Upload a blurred photo, choose your algorithm, then click <strong>Restore Image</strong>.</p>
+                </div>
+
+                <!-- Results Content (shown after processing) -->
+                <div id="resultsContent" style="display: none;">
+
+                    <!-- Comparison Slider -->
+                    <div class="card result-card">
+                        <div class="result-card-header">
+                            <div class="result-card-title-group">
+                                <h3 class="result-card-title">Before vs. After</h3>
+                                <span class="technique-badge" id="techniqueBadge">Smart Deblur</span>
+                            </div>
+                            <div class="view-toggle">
+                                <button type="button" class="view-btn active" id="viewSliderBtn">Slider</button>
+                                <button type="button" class="view-btn" id="viewSideBySideBtn">Side-by-Side</button>
+                            </div>
+                        </div>
+
+                        <!-- Slider View -->
+                        <div class="comparison-slider-container" id="sliderView">
+                            <div class="comparison-slider-wrap" id="comparisonWrap">
+                                <img id="restoredImgSlider" src="" alt="Restored Image" class="comparison-img">
+                                <div class="comparison-original-half" id="originalHalf">
+                                    <img id="originalImgSlider" src="" alt="Original Blurred Image" class="comparison-img">
+                                </div>
+                                <div class="slider-divider" id="sliderDivider">
+                                    <div class="slider-handle">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                            <path d="M9 18l-6-6 6-6M15 6l6 6-6 6"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <span class="slider-label-left">BLURRED</span>
+                                <span class="slider-label-right">RESTORED</span>
+                            </div>
+                        </div>
+
+                        <!-- Side-by-Side View -->
+                        <div class="side-by-side-view" id="sideBySideView" style="display: none;">
+                            <div class="side-img-wrap">
+                                <div class="side-label blurred-label">Original (Blurred)</div>
+                                <img id="originalImgSide" src="" alt="Original" class="side-img">
+                            </div>
+                            <div class="side-img-wrap">
+                                <div class="side-label restored-label">Restored (LumiPix)</div>
+                                <img id="restoredImgSide" src="" alt="Restored" class="side-img">
+                            </div>
+                        </div>
+
+                        <!-- Download -->
+                        <div class="result-actions">
+                            <a href="#" id="downloadBtn" class="btn btn-lg btn-gradient" download style="text-decoration: none;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="btn-icon">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="7 10 12 15 17 10"/>
+                                    <line x1="12" y1="15" x2="12" y2="3"/>
+                                </svg>
+                                Download Restored Image
+                            </a>
+                            <button type="button" class="btn btn-lg btn-outline" id="restoreAgainBtn">
+                                Try Another Filter
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Metrics -->
+                    <div class="card result-card metrics-card" id="metricsCard">
+                        <h3 class="result-card-title">Image Quality Analysis</h3>
+                        <div class="metrics-grid">
+                            <div class="metric-item">
+                                <div class="metric-header">
+                                    <span class="metric-label">Sharpness (Laplacian)</span>
+                                    <span class="metric-change" id="lapChange">-</span>
+                                </div>
+                                <div class="metric-bars">
+                                    <div class="metric-bar-row">
+                                        <span class="bar-label">Before</span>
+                                        <div class="bar-track"><div class="bar-fill bar-before" id="lapBeforeBar"></div></div>
+                                        <span class="bar-val" id="lapBeforeVal">-</span>
+                                    </div>
+                                    <div class="metric-bar-row">
+                                        <span class="bar-label">After</span>
+                                        <div class="bar-track"><div class="bar-fill bar-after" id="lapAfterBar"></div></div>
+                                        <span class="bar-val" id="lapAfterVal">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-header">
+                                    <span class="metric-label">Tenengrad Gradient Energy</span>
+                                    <span class="metric-change" id="tenChange">-</span>
+                                </div>
+                                <div class="metric-bars">
+                                    <div class="metric-bar-row">
+                                        <span class="bar-label">Before</span>
+                                        <div class="bar-track"><div class="bar-fill bar-before" id="tenBeforeBar"></div></div>
+                                        <span class="bar-val" id="tenBeforeVal">-</span>
+                                    </div>
+                                    <div class="metric-bar-row">
+                                        <span class="bar-label">After</span>
+                                        <div class="bar-track"><div class="bar-fill bar-after" id="tenAfterBar"></div></div>
+                                        <span class="bar-val" id="tenAfterVal">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-header">
+                                    <span class="metric-label">Contrast (Std Dev)</span>
+                                    <span class="metric-change" id="conChange">-</span>
+                                </div>
+                                <div class="metric-bars">
+                                    <div class="metric-bar-row">
+                                        <span class="bar-label">Before</span>
+                                        <div class="bar-track"><div class="bar-fill bar-before" id="conBeforeBar"></div></div>
+                                        <span class="bar-val" id="conBeforeVal">-</span>
+                                    </div>
+                                    <div class="metric-bar-row">
+                                        <span class="bar-label">After</span>
+                                        <div class="bar-track"><div class="bar-fill bar-after" id="conAfterBar"></div></div>
+                                        <span class="bar-val" id="conAfterVal">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="metric-summary" id="metricAssessment"></div>
+                        <div class="processing-time" id="processingTime"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- ═══════════════════════════════════════════════════════ THEORY ══ -->
+<section class="theory-section" id="theory-section">
+    <div class="container">
+        <div class="section-header text-center">
+            <span class="section-tag">The Science</span>
+            <h2 class="section-title">How LumiPix Restores Your Images</h2>
+            <p class="section-subtitle">Every algorithm is carefully implemented using proven signal-processing mathematics.</p>
+        </div>
+        <div class="theory-grid">
+            <div class="theory-card featured-theory">
+                <div class="theory-icon-wrap gradient-1">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L12 6M12 18L12 22M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83"/>
+                        <circle cx="12" cy="12" r="5"/>
+                    </svg>
+                </div>
+                <div class="theory-content">
+                    <h3 class="theory-title">Smart Adaptive Deblur <span class="badge badge-success">LumiPix Core</span></h3>
+                    <p>An 8-step automatic pipeline. First, it decomposes your image into luminance + color in LAB space. Then applies <strong>Richardson–Lucy iterative deconvolution</strong> with an auto-estimated PSF. Multi-scale detail recovery layers at 3 different frequencies (fine, medium, coarse). <strong>CLAHE</strong> normalization reveals hidden tones. <strong>Total Variation</strong> denoising removes ringing. Finally, <strong>Guided Filter edge-polishing</strong> and chroma boost produce sharp, vivid, natural-looking results.</p>
+                    <div class="formula-block">
+                        <code>I<sub>n+1</sub> = I<sub>n</sub> &middot; (h<sup>T</sup> * (Y / (h * I<sub>n</sub>)))</code>
+                        <span class="formula-label">Richardson–Lucy Update</span>
+                    </div>
+                </div>
+            </div>
+            <div class="theory-card">
+                <div class="theory-icon-wrap gradient-2">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M2 12h20M12 2v20"/><circle cx="12" cy="12" r="3"/>
+                    </svg>
+                </div>
+                <div class="theory-content">
+                    <h3 class="theory-title">Wiener Deconvolution</h3>
+                    <p>Inverts the blur in the frequency domain using a known PSF. Balances sharpness vs. noise amplification via the regularization constant <em>K</em>.</p>
+                    <div class="formula-block">
+                        <code>W(f) = H*(f) / (|H(f)|&sup2; + K)</code>
+                        <span class="formula-label">Wiener Filter Transfer Function</span>
+                    </div>
+                </div>
+            </div>
+            <div class="theory-card">
+                <div class="theory-icon-wrap gradient-3">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </div>
+                <div class="theory-content">
+                    <h3 class="theory-title">Unsharp Masking</h3>
+                    <p>Subtracts a blurred copy from the original to extract a high-pass "mask" of edges, then adds it back amplified.</p>
+                    <div class="formula-block">
+                        <code>I<sub>sharp</sub> = I + &alpha;(I &minus; G&sigma;*I)</code>
+                        <span class="formula-label">Unsharp Mask Formula</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ HOW TO USE ══ -->
+<section class="instructions-section" id="instructions-section">
+    <div class="container">
+        <div class="section-header text-center">
+            <span class="section-tag">User Guide</span>
+            <h2 class="section-title">How to Use LumiPix</h2>
+            <p class="section-subtitle">Four simple steps from blurry to crystal-clear in seconds.</p>
+        </div>
+        <div class="steps-track">
+            <div class="step-card">
+                <div class="step-number">01</div>
+                <div class="step-icon-wrap">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/>
+                        <path d="M12 12v9"/><path d="m16 16-4-4-4 4"/>
+                    </svg>
+                </div>
+                <h4 class="step-title">Upload Image</h4>
+                <p class="step-desc">Drag &amp; drop or click to upload any blurred photo from your device.</p>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step-card">
+                <div class="step-number">02</div>
+                <div class="step-icon-wrap">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                    </svg>
+                </div>
+                <h4 class="step-title">Select Algorithm</h4>
+                <p class="step-desc">Choose <strong>Smart Adaptive Deblur</strong> for best results on any photo.</p>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step-card">
+                <div class="step-number">03</div>
+                <div class="step-icon-wrap">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
+                    </svg>
+                </div>
+                <h4 class="step-title">Restore Image</h4>
+                <p class="step-desc">Click <strong>Restore Image</strong>. LumiPix processes and returns a sharp, clear result in seconds.</p>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step-card">
+                <div class="step-number">04</div>
+                <div class="step-icon-wrap">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                </div>
+                <h4 class="step-title">Compare &amp; Download</h4>
+                <p class="step-desc">Use the slider to compare before/after, then download your restored PNG.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ FOOTER ══ -->
+<footer class="site-footer">
+    <div class="container footer-content">
+        <div class="footer-brand">
+            <span class="brand-title footer-brand-title">Lumi<span class="highlight">Pix</span></span>
+            <p class="footer-tagline">AI-powered image restoration. Every detail recovered.</p>
+        </div>
+        <div class="footer-tech">
+            <span class="footer-tech-item">Python &amp; Flask</span>
+            <span class="footer-tech-item">OpenCV</span>
+            <span class="footer-tech-item">NumPy / SciPy</span>
+            <span class="footer-tech-item">Richardson–Lucy</span>
+            <span class="footer-tech-item">Wiener Filter</span>
+        </div>
+        <div class="footer-copy">
+            &copy; 2026 LumiPix &mdash; Image Restoration Using Deblurring Techniques
+        </div>
+    </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════════════════ AUTH MODAL ══ -->
+<div class="modal-overlay" id="authModalOverlay" style="display: none;">
+    <div class="modal-box" id="authModal">
+        <button type="button" class="modal-close" id="authModalClose" aria-label="Close">&times;</button>
+        <div class="modal-logo">
+            <span class="brand-title">Lumi<span class="highlight">Pix</span></span>
+        </div>
+
+        <!-- Tabs -->
+        <div class="modal-tabs">
+            <button type="button" class="modal-tab active" id="loginTabBtn">Sign In</button>
+            <button type="button" class="modal-tab" id="signupTabBtn">Create Account</button>
+        </div>
+
+        <!-- Login Form -->
+        <form id="loginForm" class="auth-form" autocomplete="off">
+            <div class="form-group">
+                <label for="loginEmail" class="form-label">Email Address</label>
+                <input type="email" id="loginEmail" class="form-input" placeholder="you@email.com" required autocomplete="email">
+            </div>
+            <div class="form-group">
+                <label for="loginPassword" class="form-label">Password</label>
+                <input type="password" id="loginPassword" class="form-input" placeholder="Your password" required autocomplete="current-password">
+            </div>
+            <div class="auth-error-msg" id="loginError" style="display: none;"></div>
+            <button type="submit" class="btn btn-lg btn-gradient" style="width: 100%;">Sign In to LumiPix</button>
+            <p class="auth-switch-text">Don't have an account? <a href="#" id="switchToSignup">Create one</a></p>
+        </form>
+
+        <!-- Signup Form -->
+        <form id="signupForm" class="auth-form" style="display: none;" autocomplete="off">
+            <div class="form-group">
+                <label for="signupName" class="form-label">Full Name</label>
+                <input type="text" id="signupName" class="form-input" placeholder="Your full name" required autocomplete="name">
+            </div>
+            <div class="form-group">
+                <label for="signupEmail" class="form-label">Email Address</label>
+                <input type="email" id="signupEmail" class="form-input" placeholder="you@email.com" required autocomplete="email">
+            </div>
+            <div class="form-group">
+                <label for="signupPassword" class="form-label">Password</label>
+                <input type="password" id="signupPassword" class="form-input" placeholder="Min. 6 characters" required autocomplete="new-password">
+            </div>
+            <div class="auth-error-msg" id="signupError" style="display: none;"></div>
+            <button type="submit" class="btn btn-lg btn-gradient" style="width: 100%;">Create My Account</button>
+            <p class="auth-switch-text">Already have an account? <a href="#" id="switchToLogin">Sign in</a></p>
+        </form>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
